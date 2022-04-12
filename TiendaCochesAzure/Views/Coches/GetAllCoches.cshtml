@@ -1,0 +1,18 @@
+﻿@model List<NuGetCoches.Coche>
+@{
+    ViewData["Title"] = "GetAllCoches";
+}
+
+<h1>GetAllCoches</h1>
+@foreach (NuGetCoches.Coche coche in Model)
+{
+    <h1>@coche.IdCoche</h1>
+    <h1>@coche.Nombre</h1>
+    <h1>@coche.Precio</h1>
+    <h1>@coche.Foto1</h1>
+    <textarea>@coche.Descripcion</textarea>
+
+
+
+}
+
