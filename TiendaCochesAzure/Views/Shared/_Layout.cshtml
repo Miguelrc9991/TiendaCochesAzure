@@ -3,46 +3,74 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - TiendaCochesAzure</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+
+
+        body {
+            background: url('https://storagetajamarmrc.blob.core.windows.net/imagenes/black-background.jpg');
+            font-size: large
+        }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">TiendaCochesAzure</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+        <nav class="navbar navbar-expand-lg navbar-light bg-transparent" >
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <span style="color:white"> Compra Venta De Coches</span>
+
+            </a>
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a asp-controller="Home" asp-action="Index" class="nav-link" style="color:white">
+                            <span style="color:white">Menú</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" style="color:white">
+                        <a asp-controller="Coches" asp-action="GetMarcas" class="nav-link" style="color:white">Catálogo</a>
+                    </li>
+
+                    @if (Context.User.Identity.IsAuthenticated == true)
+                    {
+                        <li class="nav-item" style="color:white">
+                            <a asp-controller="Coches" asp-action="GetMisCoches" asp-route-idusuario="@int.Parse(Context.User.FindFirst("ID").Value)" class="nav-link" style="color:white">Mis Anuncios</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Coches" asp-action="GetAllCoches">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
+                        @if (Context.User.Identity.Name.Equals("Miguel"))
+                        {
+                            <li class="nav-item" style="color:white">
+                                <a asp-controller="Coches" asp-action="GetUsuarios" class="nav-link" style="color:white">Usuarios</a>
+                            </li>
+                            <li class="nav-item" style="color:white">
+                                <a asp-controller="Coches" asp-action="GetAllCoches" class="nav-link" style="color:white">Todos los anuncios</a>
+                            </li>
+                        }
+                    }
+                </ul>
+                <span class="navbar-text">
+                    <ul class="navbar-nav mr-auto">
+                        <partial name="_MenuLoginPartial" />
+                        </ul>
+</span>
+
             </div>
         </nav>
+        <div style="height:2px; background-color:white"></div>
+
     </header>
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
+    <style>
+        li {
+            margin-right: 10px;
+            margin-left: 10px;
+        }
+    </style>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2022 - TiendaCochesAzure - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

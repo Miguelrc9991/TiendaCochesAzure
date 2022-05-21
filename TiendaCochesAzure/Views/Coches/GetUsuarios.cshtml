@@ -1,0 +1,30 @@
+﻿@model List<TiendaCochesAzure.Models.Usuario>
+<table class="table table-danger"> 
+    <thead> 
+        <tr>
+            <th>Id Usuario</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Fotografía Perfil</th>
+        </tr> 
+    </thead> 
+    <tbody> 
+    @foreach (TiendaCochesAzure.Models.Usuario user in Model) { 
+        <tr>
+            <td>@user.IdUsuario</td>
+            <td>@user.Nombre</td>
+            <td>@user.Email</td>
+            <td>
+                <img src="@user.Imagen" width="100" class="rounded-circle">
+            </td>
+            <td>
+                @if (user.Nombre.Equals("Miguel")) { <span>Administrador</span>  }
+                else
+                {<a asp-controller="Coches" asp-action="DeleteUsuario" asp-route-idusuario="@user.IdUsuario" class="btn btn-danger">Eliminar Usuario</a>}
+
+
+            </td>
+        </tr> 
+            } 
+        </tbody> 
+</table>      

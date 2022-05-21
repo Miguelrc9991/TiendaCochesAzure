@@ -1,0 +1,59 @@
+﻿@model IEnumerable<Marca>
+
+
+
+<style>
+    .b25 {
+        background: #252525;
+    }
+
+    .b1 {
+        background: #1b1b1b;
+    }
+
+    body {
+        font-family: 'Lobster', cursive;
+    }
+
+    .a1 {
+        background: #1b1b1b;
+    }
+
+    .a3 {
+        background: black;
+    }
+
+    .a2 {
+        background: #4C4D4D;
+    }
+
+    .a4 {
+        font-family: 'Notable', sans-serif;
+    }
+</style>
+
+
+
+<div class="w-100 p-5 d-lg-flex flex-row justify-content-center">
+    <div class="list-group">
+        @foreach (var item in Model)
+        {
+
+            <a class="list-group-item list-group-item-action" asp-controller="Coches" asp-action="GetVersiones" asp-route-idMarca="@item.IdMarca" style=" margin-right: 300px">
+                <img class="rounded-circle" style="height: 40px; width: 50px;" src=@item.Imagen
+                     data-holder-rendered="true">
+
+                @item.NombreMarca
+
+            </a>
+
+
+        }
+    </div>
+
+</div>
+
+
+
+
+

@@ -7,7 +7,8 @@
         box-sizing: border-box;
         font-size: 16px;
         position: relative;
-        background-color: black;
+    
+    
     }
 
     .shop-window {
@@ -50,7 +51,9 @@
 
 
 
-
+@{
+    int idversion = Int32.Parse(ViewData["idversion"].ToString());
+}
 
 @{ int cont = 0;
 }
@@ -59,7 +62,21 @@
 @foreach (Coche item in Model)
 {
 
+    @if (cont == 0)
+    {
+    
+        cont++;
+<div style=" position: relative;
+       top:50px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        margin-bottom:25px;
 
+">
+    <a style="margin:10px" class="btn btn-success" asp-controller="Coches" asp-action="NuevoCoche" asp-route-idVersion="@idversion">Añadir Anuncio</a>
+
+</div>}
 
     <div class="shop-window" style="margin-bottom:50px">
 
@@ -70,8 +87,10 @@
                 <p>  @Html.DisplayFor(modelItem => item.Descripcion)</p>
                 <p style="color:limegreen"> @Html.DisplayFor(modelItem => item.Precio)€</p>
 
-
-
+                @*<a class=" btn btn-success" asp-controller="Coches" asp-action="SendMailAsync" asp-route-idvendedor="@item.IdVendedor"
+        asp-route-emailcomprador="@Context.User.FindFirst("Mail").Value" asp-route-nombre="@item.Nombre">Contactar</a>*@
+                <a class=" btn btn-success" asp-controller="Coches" asp-action="EnviarMail" asp-route-idvendedor="@item.IdVendedor"
+        asp-route-emailcomprador="@Context.User.FindFirst("Mail").Value" asp-route-nombre="@item.Nombre" >Contactar</a>
             </div>
         </div>
         <div class="shop-window_item-image">
@@ -79,13 +98,6 @@
                 <img src="@Html.DisplayFor(modelItem => item.Foto1)" class="shop-window_item-image_image_large" />
             </div>
         </div>
-        <div>
-            @*<h2 style="margin-right:10px;width:50px;height:200px"><a asp-controller="Coches" asp-action="DeleteCoche" asp-route-idcoche="@item.IdCoche" class="btn btn-danger">X</a></h2>*@
 
-        </div>
 
-    </div>
-    <br />
-    <hr />
-    <br />
-}
+    </div>}

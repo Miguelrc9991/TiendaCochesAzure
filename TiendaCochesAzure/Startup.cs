@@ -1,3 +1,5 @@
+using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -24,13 +26,34 @@ namespace TiendaCochesAzure
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            string azurestoragekeys = this.Configuration.GetConnectionString("AzureStorageKeys");
+            BlobServiceClient blobServiceClient = new BlobServiceClient(azurestoragekeys);
+            services.AddTransient<BlobServiceClient>(x => blobServiceClient);
+
+
             string urlApi =
           this.Configuration.GetValue<string>("UrlApis:ApiCoches");
-            ServiceApiCoches serviceDoctores =
+            ServiceApiCoches serviceApiCoches =
                 new ServiceApiCoches(urlApi);
-            services.AddTransient<ServiceApiCoches>(x => serviceDoctores);
+            ServiceStorageBlobs serviceBlob = new ServiceStorageBlobs(blobServiceClient);
+            services.AddTransient<ServiceStorageBlobs>(x => serviceBlob);
 
-            services.AddControllersWithViews();
+            services.AddTransient<ServiceApiCoches>(x => serviceApiCoches);
+            services.AddTransient<ServiceLogicApps>();
+            services.AddDistributedMemoryCache();
+            services.AddSession(options => {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.IsEssential = true;
+            });
+            services.AddAuthentication(options => {
+                options.DefaultAuthenticateScheme =
+                CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme =
+                CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme =
+                CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie();
+            services.AddControllersWithViews(options => options.EnableEndpointRouting = false);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,14 +73,16 @@ namespace TiendaCochesAzure
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseAuthentication();
 
             app.UseAuthorization();
+            app.UseSession();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
+            app.UseMvc(routes => {
+                routes.MapRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Home}/{action=Index}/{id?}"
+                );
             });
         }
     }

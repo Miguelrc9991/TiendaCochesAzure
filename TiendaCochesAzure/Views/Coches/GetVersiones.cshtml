@@ -1,0 +1,91 @@
+﻿@model List<NuGetCoches.Version>
+
+@{ ViewData["Title"] = "GetVersiones"; }
+<div style="border-style:outset;border-color:whitesmoke;border-top:0px;border-right:0px;border-left:0px;border-bottom-width:70%">
+
+    <h1 class="text-center">Versiones</h1>
+</div>
+<br />
+@if (Model.Count != 0)
+{
+    <div>
+
+
+        @foreach (var item in Model)
+        {
+
+            <div class="trim-list-item-container" style="border-style:outset;border-color:whitesmoke;padding:10px;padding-bottom:25px">
+                <div class="trim-list-item">
+                    <div class="trim-row">
+                        <div class="trim-info">
+                            <div style="border-style:outset;border-color:whitesmoke;border-top:0px;border-right:0px;border-left:0px;">
+                                <h3 class="trim-name text-center">
+                                    @Html.DisplayFor(modelItem => item.Nombre)
+                                </h3>
+                            </div>
+                            <hr style="color:white" />
+                            <div class="trim-price--tablet">
+                                <div class="trim-prices">
+                                    <div class="pricing-trim-labels text-center ">
+                                        <div class="pricing-trim-label text-center">
+                                            Precio
+                                        </div>
+                                    </div>
+                                    <div class="pricing-trim-prices text-center">
+                                        <div class="pricing-trim-price text-center">
+                                            <b>Desde @Html.DisplayFor(modelItem => item.Precio)€</b>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div style="height: auto;">
+                                <p style="height: auto;">
+                                    @Html.DisplayFor(modelItem => item.Descripcion)
+                                </p>
+                            </div>
+                            <div class="trim-actions">
+                                <a class="btn btn-success" asp-controller="Coches" asp-action="GetCoches" asp-route-idVersion="@item.IdVersion">Ver los coches disponibles</a>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <br />
+            <br />}
+    </div>}
+else
+{
+    <h1>Lo sentimos, actualmente no hay anuncios de este producto</h1>}
+<style>
+
+
+    body {
+        color: white;
+        line-height: 28px;
+        font-family: 'Lobster', cursive;
+    }
+
+    div {
+        display: block;
+    }
+
+
+    .trim-actions {
+        display: block;
+        width: 100%;
+        max-width: 296px;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+
+
+
+
+

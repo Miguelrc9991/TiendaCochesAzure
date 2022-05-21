@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Modelo>
+
+@{
+    ViewData["Title"] = "GetModelos";
+}
+
+<h1>GetModelos</h1>
+<style>
+    .b25 {
+        background: #252525;
+    }
+
+    .b1 {
+        background: #1b1b1b;
+    }
+
+    body {
+        font-family: 'Lobster', cursive;
+    }
+
+    .a1 {
+        background: #1b1b1b;
+    }
+
+    .a3 {
+        background: black;
+    }
+
+    .a2 {
+        background: #4C4D4D;
+    }
+
+    .a4 {
+        font-family: 'Notable', sans-serif;
+    }
+</style>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.IdModelo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NombreModelo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdMarca)
+            </th>
+            <th>Versiones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IdModelo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NombreModelo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IdMarca)
+                </td>
+                <td>
+                    <a class="nav-link" asp-controller="Coches" asp-action="GetVersiones" asp-route-idModelo="@item.IdModelo">Ver Versiones de @item.NombreModelo</a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
