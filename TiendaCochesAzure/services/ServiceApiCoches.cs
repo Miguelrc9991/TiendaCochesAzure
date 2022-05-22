@@ -371,6 +371,9 @@ namespace TiendaCochesAzure.services
                 coche.Descripcion = Descripcion;
                 coche.Precio = Precio;
                 coche.Foto1 = fileName;
+                coche.Foto2 = "";
+                coche.Foto3 = "";
+
                 string json = JsonConvert.SerializeObject(coche);
 
                 StringContent content = new StringContent
