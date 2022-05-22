@@ -1,10 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Amazon;
+using Amazon.SimpleEmail;
+using Amazon.SimpleEmail.Model;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using NuGetCoches;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using TiendaCochesAzure.Filters;
 using TiendaCochesAzure.Models;
@@ -16,25 +22,67 @@ namespace TiendaCochesAzure.Controllers
     {
         private ServiceApiCoches service;
         private ServiceStorageBlobs serviceb;
+
+        private ServiceAWSS3 services3;
         private ServiceLogicApps servicela;
-        public CochesController(ServiceApiCoches service, ServiceStorageBlobs serviceb, ServiceLogicApps servicela)
+        private IConfiguration Configuration;
+
+        public CochesController(ServiceApiCoches service, ServiceStorageBlobs serviceb, ServiceLogicApps servicela, ServiceAWSS3 services3, IConfiguration Configuration)
         {
             this.service = service;
             this.serviceb = serviceb;
             this.servicela = servicela;
+            this.services3 = services3;
+            this.Configuration = Configuration;
         }
-        public async Task<IActionResult> EnviarMail(int idvendedor, string emailcomprador,string nombre)
+        public async Task<IActionResult> EnviarMail(int idvendedor, string emailcomprador, string nombre)
         {
             string emailVendedor = await this.service.GetEmailAsync(idvendedor);
             string subject = "Más información del producto: " + nombre;
-            string body = "Un comprador está interesado en el siguiente de sus anuncios: "+nombre+
+            string body = "Un comprador está interesado en el siguiente de sus anuncios: " + nombre +
                 "</br>" +
-                "Puede contactarle a su correo: "+emailcomprador;
-           await this.servicela.SendMailAsync(emailVendedor
-                           , subject, body);
-            return RedirectToAction("Index", "Home");
+                "Puede contactarle a su correo: " + emailcomprador;
+            var client =
+             new AmazonSimpleEmailServiceClient(RegionEndpoint.USEast1);
+            Destination destination = new Destination();
+            destination.ToAddresses = new List<string> { emailVendedor };
+            Message message = new Message();
+            message.Subject = new Content(subject);
+            Body cuerpo = new Body();
+            cuerpo.Html = new Content(body);
+            cuerpo.Text = new Content(body);
+            message.Body = cuerpo;
+            SendEmailRequest request = new SendEmailRequest();
+            //QUIEN ENVIA EL MENSAJE (NUESTRO USER VERIFIED EN SERVICIO SES)
+            request.Source = "miguel.ricocorrales@gmail.com";
+            request.Destination = destination;
+            request.Message = message;
+            SendEmailResponse response =
+                await client.SendEmailAsync(request);
 
+            return RedirectToAction("Index", "Home");
         }
+
+        //public async Task<IActionResult> EnviarMail(int idvendedor, string emailcomprador, string nombre)
+        //{
+        //    string emailVendedor = await this.service.GetEmailAsync(idvendedor);
+        //    string subject = "Más información del producto: " + nombre;
+        //    string body = "Un comprador está interesado en el siguiente de sus anuncios: " + nombre +
+        //        "</br>" +
+        //        "Puede contactarle a su correo: " + emailcomprador;
+        //    //await this.servicela.SendMailAsync(emailVendedor
+        //    //                , subject, body);
+        //    EmailModel emailModel = new EmailModel
+        //    {
+        //        Email = emailVendedor,
+        //        Subject = subject,
+        //        Body = body
+        //    };
+        //    await this.servicesqs.SendMessageAsync(emailModel);
+
+        //    return RedirectToAction("Index", "Home");
+
+        //}
         //public async Task<IActionResult> EnviarMail()
         //{
 
@@ -126,13 +174,13 @@ namespace TiendaCochesAzure.Controllers
             Models.Usuario usuario = await this.service.FindUsuarioAsync(token);
             using (Stream stream = file.OpenReadStream())
             {
-                await this.serviceb.UploadBlobAsync(file.FileName, stream);
+                await this.services3.UploadFileAsync(stream, file.FileName);
             }
 
-            BlobClass blob = await this.serviceb.FindBlobByName(file.FileName);
+
        
             await this.service.InsertCocheAsync(
-                usuario.IdUsuario,coche.IdVersion,coche.Nombre,coche.Descripcion,coche.Precio,blob.Url);
+                usuario.IdUsuario,coche.IdVersion,coche.Nombre,coche.Descripcion,coche.Precio, file.FileName);
             return RedirectToAction("GetMarcas", "Coches");
         }
         public IActionResult NuevoUsuario()
@@ -144,10 +192,9 @@ namespace TiendaCochesAzure.Controllers
         {
             using (Stream stream = file.OpenReadStream())
             {
-                await this.serviceb.UploadBlobAsync(file.FileName, stream);
+                await this.services3.UploadFileAsync(stream, file.FileName);
             }
-            BlobClass blob = await this.serviceb.FindBlobByName(file.FileName);
-            await this.service.InsertUsuarioAsync(0,nombre,contraseña,email,blob.Url);
+            await this.service.InsertUsuarioAsync(0,nombre,contraseña,email, file.FileName);
             return RedirectToAction("Login", "Manage");
 
         }
@@ -162,11 +209,11 @@ namespace TiendaCochesAzure.Controllers
         {
             using (Stream stream = file.OpenReadStream())
             {
-                await this.serviceb.DeleteBlobAsync(ViewData["URL"].ToString());
-              await this.serviceb.UploadBlobAsync(file.FileName, stream);
+                await this.services3.DeleteFileAsync(file.FileName);
+
+                await this.services3.UploadFileAsync(stream, file.FileName);
             }
-            BlobClass blob = await this.serviceb.FindBlobByName(file.FileName);
-            await this.service.InsertUsuarioAsync(0, nombre, contraseña, email, blob.Url);
+            await this.service.InsertUsuarioAsync(0, nombre, contraseña, email, file.FileName);
             return RedirectToAction("Login", "Manage");
         }
         [AuthorizeUsuarios]

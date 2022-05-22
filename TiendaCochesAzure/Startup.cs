@@ -1,3 +1,4 @@
+using Amazon.S3;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -37,6 +38,8 @@ namespace TiendaCochesAzure
                 new ServiceApiCoches(urlApi);
             ServiceStorageBlobs serviceBlob = new ServiceStorageBlobs(blobServiceClient);
             services.AddTransient<ServiceStorageBlobs>(x => serviceBlob);
+            services.AddAWSService<IAmazonS3>();
+            services.AddTransient<ServiceAWSS3>();
 
             services.AddTransient<ServiceApiCoches>(x => serviceApiCoches);
             services.AddTransient<ServiceLogicApps>();
